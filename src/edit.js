@@ -1,5 +1,5 @@
 import { useState } from '@wordpress/element'
-import { CheckboxControl , Modal, Button } from '@wordpress/components'
+import { CheckboxControl , Modal, Button, Spinner } from '@wordpress/components'
 import { useBlockProps } from '@wordpress/block-editor'
 import apiFetch from '@wordpress/api-fetch'
 
@@ -35,11 +35,12 @@ async function loadData() {
 
 export function edit({attributes, setAttributes}) {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isDataLoading, setIsDataLoading] = useState(false)
     const [isDataLoaded, setIsDataLoaded] = useState(false)
     const [selectedPartners, setSelectedPartners] = useState(attributes.selectedPartners)
 
     function onChangePartner(newSelectedPartners) {
-      setAttributes({partners: newSelectedPartners})
+      setAttributes({selectedPartners: newSelectedPartners})
     }
 
     function openModal() {
@@ -48,6 +49,7 @@ export function edit({attributes, setAttributes}) {
 
     function closeModal() {
       setIsModalOpen(false)
+      onChangePartner(selectedPartners)
     }
 
     function handleToogleCheckbox(isChecked, partnerId) {
@@ -59,76 +61,83 @@ export function edit({attributes, setAttributes}) {
     }
 
     if (!isDataLoaded) {
-      const partnersOrdered = loadData().then((partners) => partners)
+      loadData().then((partnersOrdered) => {
+        setIsDataLoading(true)
+        setIsDataLoaded(true)
+        setAttributes({ partners: partnersOrdered, isDataLoaded: true })
+      }).then(() => setIsDataLoading(false))
+      
+    }
 
-      setAttributes({ partners: partnersOrdered })
-      setIsDataLoaded(true)
-
-      return (
-        <>
-        <div {...useBlockProps()}>
-          <Button
+    return (
+      <>
+      <div {...useBlockProps()}>
+        <Button
             variant='primary'
             onClick={openModal}
           >
-            Selecionar Parceiros
-          </Button>
-          {
-            selectedPartners.length > 0 &&
-            <div className="partners-list">
-              {
-                selectedPartners.map((partnerId) => {
-                  partnersOrdered.find((partner) => {
-                    if (partner.value === partnerId) {
-                      return (
-                        <a 
-                          href={partner.linkUrl}
-                          className="partner"
-                        >
-                          <img
-                            src={partner.imageSrc}
-                            alt={partner.label}
-                          />
-                        </a>
-                      )
-                    }
-                  })
-                })
-              }
-            </div>
-          }
-          {
-            isModalOpen &&
-            <Modal 
-              className='partner-list-modal'
-              title='Selecionar os parceiros'
-              shouldCloseOnClickOutside
-              onRequestClose={closeModal}
-            >
-              {
-                partnersOrdered.map((partner) => {
-                  
-                  return <CheckboxControl
-                    key={partner.value}
-                    label={partner.label}
-                    checked={selectedPartners.includes(partner.value)}
-                    onChange={(isChecked) => handleToogleCheckbox(isChecked, partner.value)}
-                  /> 
-                })
-              }
-              <div className="partner-list-modal-footer">
-                <Button
-                  variant='primary'
-                  onClick={closeModal}
-                >
-                  Salvar
-                </Button>
-              </div>
-            </Modal>
-            }
-        </div>
-        </>
-      )
+          Selecionar Parceiros
+        </Button>
+        {
+          selectedPartners.length > 0 &&
+          <div className="partners-list">
+            {
+              selectedPartners.map((partnerId) => {
+                attributes.partners.find((partner) => {
+                  if (partner.value === partnerId) {
+                    return (
+                      <a 
+                        href={partner.linkUrl}
+                        className="partner"
+                      >
+                        <img
+                          src={partner.imageSrc}
+                          alt={partner.label}
+                        />
+                      </a>
+                    )
+                  }
 
-    }
+                  return <p>{selectedPartners.length}</p>
+                })
+              })
+            }
+          </div>
+        }
+        {
+          isModalOpen &&
+          <Modal 
+            className='partner-list-modal'
+            title='Selecionar os parceiros'
+            shouldCloseOnClickOutside
+            onRequestClose={closeModal}
+          >
+            {
+              isDataLoading
+              ? <Spinner />
+              : attributes.partners.map((partner) => {
+                
+                return <CheckboxControl
+                  key={partner.value}
+                  label={partner.label}
+                  checked={selectedPartners.includes(partner.value)}
+                  onChange={(isChecked) => handleToogleCheckbox(isChecked, partner.value)}
+                /> 
+              })
+            }
+            <p>{JSON.stringify(selectedPartners)}</p>
+            <div className="partner-list-modal-footer">
+              <Button
+                variant='primary'
+                onClick={closeModal}
+              >
+                Salvar
+              </Button>
+            </div>
+          </Modal>
+        }
+      </div>
+      </>
+    )
+    
 }
