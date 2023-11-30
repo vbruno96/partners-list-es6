@@ -3,7 +3,7 @@ import { edit } from './edit'
 import { save } from './save'
 import json from './block.json'
 
-import './style.scss'
+import './editor.scss'
 
 registerBlockType(json.name, {
   edit,

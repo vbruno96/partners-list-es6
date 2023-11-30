@@ -1,8 +1,39 @@
-import { useState } from 'react'
+import { useState } from '@wordpress/element'
 import { CheckboxControl , Modal, Button } from '@wordpress/components'
+import { useBlockProps } from '@wordpress/block-editor'
 import apiFetch from '@wordpress/api-fetch'
 
-export async function edit({attributes, setAttributes}) {
+async function loadData() {  
+  try {
+    const partners = await apiFetch({path: 'wp/v2/partners?per_page=100'})
+
+    return await partners.reduce(async (_acc, partner) => {
+      const acc = await _acc
+        
+      try {
+        const image = await apiFetch({path: `wp/v2/media/${partner.featured_media}`})
+
+        return [
+            ...acc,
+            {
+                value: partner.id.toString(),
+                label: partner.title.rendered,
+                imageSrc: image.guid.rendered,
+                linkUrl: partner.acf.partner_landing_page
+            }
+        ].sort((x, y) => x.label.toLowerCase().localeCompare(y.label.toLowerCase()))
+      } catch (error) {
+        console.error('Erro ao obter as imagens dos parceiros:', error)
+      }
+
+    }, Promise.resolve([]))
+
+  } catch (error) {
+    console.error('Erro ao obter a lista de parceiros:', error)
+  }
+}
+
+export function edit({attributes, setAttributes}) {
   const [isModalOpen, setIsModalOpen] = useState(false)
     const [isDataLoaded, setIsDataLoaded] = useState(false)
     const [selectedPartners, setSelectedPartners] = useState(attributes.selectedPartners)
@@ -27,41 +58,15 @@ export async function edit({attributes, setAttributes}) {
       onChangePartner(selectedPartners)
     }
 
-    let partnersOrdered = []
-
     if (!isDataLoaded) {
-      try {
-        const partners = await apiFetch({path: 'wp/v2/parceiros?per_page=100'})
-
-        partnersOrdered = await partners.reduce(async (_acc, partner) => {
-          const acc = await _acc
-          
-          try {
-            const mediaPayload = await fetch(partner._links['wp:featuredmedia'][0].href)
-            const image = await mediaPayload.json()
-            return [
-                ...acc,
-                {
-                    value: partner.id.toString(),
-                    label: partner.title.rendered,
-                    imageSrc: image.guid.rendered,
-                    linkUrl: partner.acf.partner_landing_page
-                }
-            ].sort((x, y) => x.name.toLowerCase().localeCompare(y.name.toLowerCase()))
-          } catch (error) {
-            console.error('Erro ao obter as imagens dos parceiros:', error)
-          }
-
-        }, Promise.resolve([]))
-      } catch (error) {
-        console.error('Erro ao obter a lista de parceiros:', error)
-      }
+      const partnersOrdered = loadData().then((partners) => partners)
 
       setAttributes({ partners: partnersOrdered })
       setIsDataLoaded(true)
 
       return (
-        <div>
+        <>
+        <div {...useBlockProps()}>
           <Button
             variant='primary'
             onClick={openModal}
@@ -101,14 +106,15 @@ export async function edit({attributes, setAttributes}) {
               onRequestClose={closeModal}
             >
               {
-                partnersOrdered.map((partner) => (
-                  <CheckboxControl
+                partnersOrdered.map((partner) => {
+                  
+                  return <CheckboxControl
                     key={partner.value}
                     label={partner.label}
                     checked={selectedPartners.includes(partner.value)}
                     onChange={(isChecked) => handleToogleCheckbox(isChecked, partner.value)}
                   /> 
-                ))
+                })
               }
               <div className="partner-list-modal-footer">
                 <Button
@@ -119,8 +125,9 @@ export async function edit({attributes, setAttributes}) {
                 </Button>
               </div>
             </Modal>
-          }
+            }
         </div>
+        </>
       )
 
     }

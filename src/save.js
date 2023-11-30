@@ -1,6 +1,8 @@
+import { useBlockProps } from '@wordpress/block-editor'
+
 export function save({attributes}) {
   return (
-    <div>
+    <div {...useBlockProps.save()}>
       {
         attributes.selectedPartners.map((partnerId) => {
           if (attributes.partners.find((partner) => partner.value === partnerId)) {

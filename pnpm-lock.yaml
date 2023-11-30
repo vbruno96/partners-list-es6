@@ -8,6 +8,9 @@ dependencies:
   '@wordpress/api-fetch':
     specifier: ^6.43.0
     version: 6.43.0
+  '@wordpress/block-editor':
+    specifier: ^12.15.0
+    version: 12.15.0(react@18.2.0)
   '@wordpress/blocks':
     specifier: ^12.23.0
     version: 12.23.0(react@18.2.0)
