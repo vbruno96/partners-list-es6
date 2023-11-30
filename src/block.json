@@ -1,0 +1,29 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "partner-list/partner-list",
+  "category": "widgets",
+  "title": "Lista de parceiros",
+  "icon": "groups",
+  "attributes": {
+    "selectedPartners": {
+      "type": "array",
+      "default": []
+    },
+    "partners": {
+      "type": "array",
+      "default": []
+    },
+    "isModalOpen": {
+      "type": "boolean",
+      "default": false
+    },
+    "isDataLoaded": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css"
+}
