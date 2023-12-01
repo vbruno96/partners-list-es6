@@ -13,14 +13,6 @@
     "partners": {
       "type": "array",
       "default": []
-    },
-    "isModalOpen": {
-      "type": "boolean",
-      "default": false
-    },
-    "isDataLoaded": {
-      "type": "boolean",
-      "default": false
     }
   },
   "editorScript": "file:./index.js",

@@ -1,11 +1,11 @@
 import { useBlockProps } from '@wordpress/block-editor'
 
-export function save({attributes}) {
+export function save({attributes: { selectedPartners, partners }}) {
   return (
-    <div {...useBlockProps.save()}>
+    <div {...useBlockProps.save({ className: 'wp-block-partner-list-partner-list' })}>
       {
-        attributes.selectedPartners.map((partnerId) => {
-          if (attributes.partners.find((partner) => partner.value === partnerId)) {
+        partners.map((partner) => {
+          if (selectedPartners.find((partnerId) => partner === partnerId)) {
             return (
               <a 
                 href={partner.linkUrl}
@@ -18,6 +18,8 @@ export function save({attributes}) {
               </a>
             )
           }
+
+          return
         })
       }
     </div>

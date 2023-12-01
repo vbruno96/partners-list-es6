@@ -1,4 +1,4 @@
-import { useState } from '@wordpress/element'
+import { useState, useEffect } from '@wordpress/element'
 import { CheckboxControl , Modal, Button, Spinner } from '@wordpress/components'
 import { useBlockProps } from '@wordpress/block-editor'
 import apiFetch from '@wordpress/api-fetch'
@@ -36,8 +36,14 @@ async function loadData() {
 export function edit({attributes, setAttributes}) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDataLoading, setIsDataLoading] = useState(false)
-    const [isDataLoaded, setIsDataLoaded] = useState(false)
     const [selectedPartners, setSelectedPartners] = useState(attributes.selectedPartners)
+
+    useEffect(() => {
+      setIsDataLoading(true)
+      loadData()
+        .then((partners) => setAttributes({ partners }))
+        .finally(() => setIsDataLoading(false))
+    }, [])
 
     function onChangePartner(newSelectedPartners) {
       setAttributes({selectedPartners: newSelectedPartners})
@@ -56,17 +62,6 @@ export function edit({attributes, setAttributes}) {
       isChecked 
         ? setSelectedPartners((prevSelected) => [...prevSelected, partnerId])
         : setSelectedPartners((selected) => selected.filter((id) => id !== partnerId))
-
-      onChangePartner(selectedPartners)
-    }
-
-    if (!isDataLoaded) {
-      loadData().then((partnersOrdered) => {
-        setIsDataLoading(true)
-        setIsDataLoaded(true)
-        setAttributes({ partners: partnersOrdered, isDataLoaded: true })
-      }).then(() => setIsDataLoading(false))
-      
     }
 
     return (
@@ -82,26 +77,11 @@ export function edit({attributes, setAttributes}) {
           selectedPartners.length > 0 &&
           <div className="partners-list">
             {
-              selectedPartners.map((partnerId) => {
-                attributes.partners.find((partner) => {
-                  if (partner.value === partnerId) {
-                    return (
-                      <a 
-                        href={partner.linkUrl}
-                        className="partner"
-                      >
-                        <img
-                          src={partner.imageSrc}
-                          alt={partner.label}
-                        />
-                      </a>
-                    )
-                  }
-
-                  return <p>{selectedPartners.length}</p>
-                })
+              selectedPartners.map((selected) => {
+                <span>{selected.toString()}</span>
               })
             }
+            <p>{attributes.selectedPartners.length.toString()}</p>
           </div>
         }
         {
@@ -121,11 +101,12 @@ export function edit({attributes, setAttributes}) {
                   key={partner.value}
                   label={partner.label}
                   checked={selectedPartners.includes(partner.value)}
-                  onChange={(isChecked) => handleToogleCheckbox(isChecked, partner.value)}
+                  onChange={(isChecked) => {
+                    handleToogleCheckbox(isChecked, partner.value)
+                  }}
                 /> 
               })
             }
-            <p>{JSON.stringify(selectedPartners)}</p>
             <div className="partner-list-modal-footer">
               <Button
                 variant='primary'
