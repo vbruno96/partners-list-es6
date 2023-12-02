@@ -1,32 +1,34 @@
 .custom-block-partners-list {
-  gap: 24px;
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 2rem;
-  align-items: center;
-  border-radius: 16px;
-  margin-bottom: 2rem;
-  justify-content: center;
-
-  .partner {
-    width: 120px;
-    height: 120px;
-    padding: 16px;
+  .partner-list {
+    gap: 24px;
     display: flex;
+    flex-wrap: wrap;
+    margin-top: 2rem;
     align-items: center;
     border-radius: 16px;
-    background-color: #fff;
+    margin-bottom: 2rem;
     justify-content: center;
-    border: 1px solid #135df5;
+
+    .partner {
+      width: 120px;
+      height: 120px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      border-radius: 16px;
+      background-color: #fff;
+      justify-content: center;
+      border: 1px solid #135df5;
+
+      @media (min-width: 768px) {
+        width: 88px;
+        height: 88px;
+        padding: 10px;
+      }
+    }
 
     @media (min-width: 768px) {
-      width: 88px;
-      height: 88px;
-      padding: 10px;
+      justify-content: flex-start;
     }
-  }
-
-  @media (min-width: 768px) {
-    justify-content: flex-start;
   }
 }
