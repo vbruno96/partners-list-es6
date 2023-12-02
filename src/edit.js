@@ -19,7 +19,7 @@ async function loadData() {
                 value: partner.id.toString(),
                 label: partner.title.rendered,
                 imageSrc: image.guid.rendered,
-                linkUrl: partner.acf.partner_landing_page
+                linkUrl: partner.acf.site_parceiro
             }
         ].sort((x, y) => x.label.toLowerCase().localeCompare(y.label.toLowerCase()))
       } catch (error) {
@@ -33,10 +33,9 @@ async function loadData() {
   }
 }
 
-export function edit({attributes, setAttributes}) {
+export function edit({attributes: { selectedPartners, partners }, setAttributes}) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDataLoading, setIsDataLoading] = useState(false)
-    const [selectedPartners, setSelectedPartners] = useState(attributes.selectedPartners)
 
     useEffect(() => {
       setIsDataLoading(true)
@@ -55,19 +54,17 @@ export function edit({attributes, setAttributes}) {
 
     function closeModal() {
       setIsModalOpen(false)
-      onChangePartner(selectedPartners)
     }
 
     function handleToogleCheckbox(isChecked, partnerId) {
       isChecked 
-        ? setSelectedPartners((prevSelected) => [...prevSelected, partnerId])
-        : setSelectedPartners((selected) => selected.filter((id) => id !== partnerId))
+        ? onChangePartner([...selectedPartners, partnerId])
+        : onChangePartner(selectedPartners.filter((id) => id !== partnerId))
     }
 
     return (
-      <>
       <div {...useBlockProps()}>
-        <Button
+      <Button
             variant='primary'
             onClick={openModal}
           >
@@ -75,13 +72,25 @@ export function edit({attributes, setAttributes}) {
         </Button>
         {
           selectedPartners.length > 0 &&
-          <div className="partners-list">
+          <div className='partners-list'>
             {
-              selectedPartners.map((selected) => {
-                <span>{selected.toString()}</span>
+              partners.map((partner) => {
+                if (selectedPartners.includes(partner.value)) {
+                  return (
+                    <a
+                      key={partner.value}
+                      href={partner.linkUrl}
+                      className="partner"
+                    >
+                      <img 
+                        src={partner.imageSrc}
+                        alt={partner.label} 
+                      />
+                    </a>
+                  )
+                }
               })
             }
-            <p>{attributes.selectedPartners.length.toString()}</p>
           </div>
         }
         {
@@ -95,7 +104,7 @@ export function edit({attributes, setAttributes}) {
             {
               isDataLoading
               ? <Spinner />
-              : attributes.partners.map((partner) => {
+              : partners.map((partner) => {
                 
                 return <CheckboxControl
                   key={partner.value}
@@ -118,7 +127,6 @@ export function edit({attributes, setAttributes}) {
           </Modal>
         }
       </div>
-      </>
     )
     
 }

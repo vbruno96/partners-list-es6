@@ -2,24 +2,23 @@ import { useBlockProps } from '@wordpress/block-editor'
 
 export function save({attributes: { selectedPartners, partners }}) {
   return (
-    <div {...useBlockProps.save({ className: 'wp-block-partner-list-partner-list' })}>
+    <div {...useBlockProps.save({className: 'custom-block-partners-list'})}>
       {
         partners.map((partner) => {
-          if (selectedPartners.find((partnerId) => partner === partnerId)) {
+          if (selectedPartners.includes(partner.value)) {
             return (
-              <a 
+              <a
+                key={partner.value}
                 href={partner.linkUrl}
                 className="partner"
               >
-                <img
+                <img 
                   src={partner.imageSrc}
-                  alt={partner.label}
+                  alt={partner.label} 
                 />
               </a>
             )
           }
-
-          return
         })
       }
     </div>
