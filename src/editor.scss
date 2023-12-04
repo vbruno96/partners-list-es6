@@ -32,6 +32,13 @@
 }
 
 .partner-list-modal {
+  .components-modal__content {
+    .spinner-container {
+      padding: 1rem 0;
+      text-align: center;
+    }
+  }
+
   .partner-list-modal-footer {
     position: sticky;
     bottom: 0;
