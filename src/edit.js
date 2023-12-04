@@ -88,17 +88,22 @@ export function edit({attributes: { selectedPartners, partners }, setAttributes}
         >
           {
             isDataLoading
-            ? <Spinner />
-            : partners.map((partner) => {
-              return <CheckboxControl
-              key={partner.value}
-              label={partner.label}
-              checked={selectedPartners.includes(partner.value)}
-              onChange={(isChecked) => {
-                handleToogleCheckbox(isChecked, partner.value)
-              }}
-              /> 
-            })
+            ? (
+              <div className="spinner-container">
+                <Spinner />
+              </div>
+            )
+            :
+              partners.map((partner) => {
+                return <CheckboxControl
+                  key={partner.value}
+                  label={partner.label}
+                  checked={selectedPartners.includes(partner.value)}
+                  onChange={(isChecked) => {
+                    handleToogleCheckbox(isChecked, partner.value)
+                  }}
+                /> 
+              })
           }
           <div className="partner-list-modal-footer">
             <Button

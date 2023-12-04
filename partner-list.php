@@ -3,6 +3,7 @@
  * Plugin Name: Lista de Parceiros
  * Description: Bloco personalizado com a lista de parceiros.
  * Author: Bruno Marques
+ * Version: 1.0.0
  * 
  */
 

@@ -3,8 +3,9 @@ export function PartnerList({partners, selectedPartners}) {
   return (
     <div className='partners-list'>
       {
-        partners.map((partner) => {
-          if (selectedPartners.includes(partner.value)) {
+        selectedPartners.map((partnerId) => {
+          const partner = partners.find(partner => partnerId === partner.value)
+          if (partner) {
             return (
               <a
                 key={partner.value}
