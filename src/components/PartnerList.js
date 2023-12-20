@@ -11,6 +11,7 @@ export function PartnerList({partners, selectedPartners}) {
                 key={partner.value}
                 href={partner.linkUrl}
                 className="partner"
+                target="_blank"
               >
                 <img 
                   src={partner.imageSrc}
